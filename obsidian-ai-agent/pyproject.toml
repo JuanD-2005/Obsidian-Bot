@@ -1,0 +1,65 @@
+[build-system]
+requires      = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ---------------------------------------------------------------------------
+# Project metadata
+# ---------------------------------------------------------------------------
+[project]
+name            = "obsidian-ai-agent"
+version         = "0.3.0"
+description     = "Autonomous knowledge management assistant for Obsidian vaults"
+readme          = "README.md"
+requires-python = ">=3.10"
+license         = { text = "MIT" }
+
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "openai>=1.30.0",
+    "ollama>=0.2.0",
+    "pydantic-settings>=2.2.0",
+    "python-dotenv>=1.0.0",
+    "prompt-toolkit>=3.0.0",
+]
+
+# ---------------------------------------------------------------------------
+# Console script — installs `obsidian-agent` into the environment's PATH
+# ---------------------------------------------------------------------------
+[project.scripts]
+obsidian-agent = "main:app"
+
+# ---------------------------------------------------------------------------
+# Optional dependency groups
+# ---------------------------------------------------------------------------
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-mock>=3.14.0",
+    "typer[all]>=0.12.0",    # pulls shellingham for shell-detection in tests
+]
+
+# ---------------------------------------------------------------------------
+# Setuptools config — tell it where to find packages
+# ---------------------------------------------------------------------------
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["agent*"]
+
+# Include main.py as a top-level module (needed for the console_script)
+[tool.setuptools.package-dir]
+"" = "."
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths    = ["tests"]
+addopts      = "-v --tb=short"
+
+# ---------------------------------------------------------------------------
+# Ruff (linter/formatter — optional but nice to have in the project def)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length    = 100
+target-version = "py310"

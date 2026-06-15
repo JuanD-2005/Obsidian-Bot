@@ -1,0 +1,13 @@
+# CLI
+typer[all]>=0.12.0
+
+# AI Providers
+openai>=1.30.0
+ollama>=0.2.0
+
+# Configuration
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.0
+
+# Utilities
+rich>=13.7.0   # already pulled by typer[all], explicit for direct use
