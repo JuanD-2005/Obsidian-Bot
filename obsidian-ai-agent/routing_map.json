@@ -1,0 +1,33 @@
+{
+  "_comment": "Mapeo exacto de las plantillas de la bóveda a sus carpetas de destino",
+  "templates": {
+    "Plantilla - Clase Particular": {
+      "destination": "02 - Trabajo y Desarrollo",
+      "keywords": ["clase particular", "alumno", "estudiante", "tutoría", "enseñar", "python", "java", "c", "inglés", "honorarios"]
+    },
+    "Plantilla - Clase UNET": {
+      "destination": "01 - UNET",
+      "keywords": ["unet", "universidad", "semestre", "parcial", "evaluación", "unet360", "asignatura", "apuntes"]
+    },
+    "Plantilla - Gastos": {
+      "destination": "03 - Finanzas",
+      "keywords": ["gasto", "comprar", "pagar", "factura", "tarjeta", "precio", "costo", "suscripción", "salida"]
+    },
+    "Plantilla - Ingreso": {
+      "destination": "03 - Finanzas",
+      "keywords": ["ingreso", "pago", "sueldo", "cobro", "transferencia", "depósito", "freelance"]
+    },
+    "Plantilla - Postulacion": {
+      "destination": "02 - Trabajo y Desarrollo",
+      "keywords": ["postulación", "cv", "entrevista", "vacante", "computrabajo", "ensolvers", "bairesdev", "micro1", "outlier", "linkedin", "portfolio"]
+    },
+    "Plantilla - Proyecto Web": {
+      "destination": "02 - Trabajo y Desarrollo",
+      "keywords": ["proyecto", "front-end", "backend", "react", "bug", "fix", "ui", "código", "jwt", "postgresql", "extensión", "api"]
+    },
+    "Plantilla - Vida": {
+      "destination": "04 - Vida",
+      "keywords": ["vida", "personal", "idea", "recordatorio", "receta", "polenta", "galletas", "camila", "emulador", "ryujinx", "sudachi", "juego", "obsidian"]
+    }
+  }
+}

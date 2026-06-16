@@ -28,6 +28,7 @@ dependencies = [
 # ---------------------------------------------------------------------------
 [project.scripts]
 obsidian-agent = "main:app"
+obsidian-gui   = "gui:launch"
 
 # ---------------------------------------------------------------------------
 # Optional dependency groups

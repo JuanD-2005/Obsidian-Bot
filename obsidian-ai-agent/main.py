@@ -113,10 +113,11 @@ def create(
 
     console.print(
         Panel.fit(
-            f"[bold cyan]Obsidian AI Agent[/bold cyan]\n"
-            f"Template : [green]{template}[/green]\n"
-            f"Provider : [yellow]{resolved_provider}[/yellow]",
+            f"[bold cyan]Obsidian AI Agent[/bold cyan]\n\n"
+            f"  [bold]Template :[/bold] [green]{template}[/green]\n"
+            f"  [bold]Provider :[/bold] [yellow]{resolved_provider.title()}[/yellow]",
             border_style="cyan",
+            title="[bold cyan]Initialization[/bold cyan]",
         )
     )
 
@@ -124,7 +125,14 @@ def create(
     try:
         settings.assert_paths_exist()
     except RuntimeError as exc:
-        err_console.print(str(exc))
+        err_console.print(
+            Panel(
+                f"[bold red]Configuration Error:[/bold red] {exc}",
+                border_style="red",
+                title="Error",
+                title_align="left",
+            )
+        )
         raise typer.Exit(code=1)
 
     # ------------------------------------------------------------------
@@ -135,22 +143,39 @@ def create(
     # ------------------------------------------------------------------
     # Step 2 — Load template
     # ------------------------------------------------------------------
-    console.print(f"[dim]Reading template '[cyan]{template}[/cyan]'…[/dim]")
+    console.print(f"[dim]Reading template '[cyan]{template}[/cyan]'...[/dim]")
     try:
         template_content = file_manager.read_template(template)
     except FileNotFoundError as exc:
-        err_console.print(str(exc))
+        err_console.print(
+            Panel(
+                f"[bold red]Template Error:[/bold red] {exc}",
+                border_style="red",
+                title="Error",
+                title_align="left",
+            )
+        )
         raise typer.Exit(code=1)
 
     # ------------------------------------------------------------------
     # Step 3 — Generate with LLM
     # ------------------------------------------------------------------
-    console.print(f"[dim]Calling [yellow]{resolved_provider}[/yellow]…[/dim]")
     try:
         llm = get_provider(resolved_provider)
-        generated_md = llm.generate(template_content, raw_data)
+        with console.status(
+            f"[bold status.spinner]Procesando con {resolved_provider.title()}...[/bold status.spinner]",
+            spinner="dots",
+        ):
+            generated_md = llm.generate(template_content, raw_data)
     except (ValueError, RuntimeError) as exc:
-        err_console.print(str(exc))
+        err_console.print(
+            Panel(
+                f"[bold red]AI Provider Error ({resolved_provider.title()}):[/bold red] {exc}",
+                border_style="red",
+                title="Error",
+                title_align="left",
+            )
+        )
         raise typer.Exit(code=1)
 
     # ------------------------------------------------------------------
@@ -159,11 +184,26 @@ def create(
     try:
         output_path = file_manager.write_note(generated_md, topic=template)
     except OSError as exc:
-        err_console.print(f"Could not write output file: {exc}")
+        err_console.print(
+            Panel(
+                f"[bold red]File System Error:[/bold red] {exc}",
+                border_style="red",
+                title="Error",
+                title_align="left",
+            )
+        )
         raise typer.Exit(code=1)
 
     console.print(
-        f"\n[bold green]✔ Note created:[/bold green] [cyan]{output_path}[/cyan]"
+        Panel(
+            f"[bold green]✔ Note successfully created![/bold green]\n\n"
+            f"  [bold]File Path:[/bold]  [cyan]{output_path}[/cyan]\n"
+            f"  [bold]Template:[/bold]   [yellow]{template}[/yellow]\n"
+            f"  [bold]Provider:[/bold]   [magenta]{resolved_provider.title()}[/magenta]",
+            title="[bold green]Success[/bold green]",
+            border_style="green",
+            expand=False,
+        )
     )
 
 
@@ -173,33 +213,54 @@ def list_templates() -> None:
     try:
         settings.assert_paths_exist()
     except RuntimeError as exc:
-        err_console.print(str(exc))
+        err_console.print(
+            Panel(
+                f"[bold red]Configuration Error:[/bold red] {exc}",
+                border_style="red",
+                title="Error",
+                title_align="left",
+            )
+        )
         raise typer.Exit(code=1)
 
     templates = sorted(settings.templates_path.glob("*.md"))  # type: ignore[union-attr]
 
     if not templates:
-        console.print("[yellow]No templates found in:[/yellow]", settings.templates_path)
+        console.print(
+            Panel(
+                f"[yellow]No templates found in directory:[/yellow]\n[cyan]{settings.templates_path}[/cyan]",
+                border_style="yellow",
+                title="Warning",
+                title_align="left",
+            )
+        )
         return
 
-    console.print(f"[bold]Templates in[/bold] [cyan]{settings.templates_path}[/cyan]:\n")
-    for tmpl in templates:
-        console.print(f"  • [green]{tmpl.stem}[/green]")
+    template_list = "\n".join(f"  • [green]{tmpl.stem}[/green]" for tmpl in templates)
+    console.print(
+        Panel(
+            f"[bold]Available templates inside vault:[/bold]\n\n{template_list}",
+            title=f"[bold cyan]Templates in {settings.templates_path.name}[/bold cyan]",
+            border_style="cyan",
+            expand=False,
+        )
+    )
 
 
 @app.command()
 def config_info() -> None:
     """Print the active configuration (useful for debugging .env setup)."""
     console.print(Panel.fit(
-        f"[bold]Active configuration[/bold]\n\n"
-        f"Vault path      : {settings.obsidian_vault_path}\n"
-        f"Templates path  : {settings.templates_path}\n"
-        f"Output path     : {settings.output_path}\n"
-        f"Default provider: {settings.default_ai_provider}\n"
-        f"OpenAI model    : {settings.openai_model}\n"
-        f"Ollama host     : {settings.ollama_host}\n"
-        f"Ollama model    : {settings.ollama_model}",
+        f"[bold cyan]Obsidian AI Agent — Active Configuration[/bold cyan]\n\n"
+        f"  [bold]Vault path[/bold]       : [cyan]{settings.obsidian_vault_path}[/cyan]\n"
+        f"  [bold]Templates path[/bold]   : [cyan]{settings.templates_path}[/cyan]\n"
+        f"  [bold]Output path[/bold]      : [cyan]{settings.output_path}[/cyan]\n"
+        f"  [bold]Default provider[/bold] : [yellow]{settings.default_ai_provider}[/yellow]\n"
+        f"  [bold]OpenAI model[/bold]     : [magenta]{settings.openai_model}[/magenta]\n"
+        f"  [bold]Ollama host[/bold]      : [magenta]{settings.ollama_host}[/magenta]\n"
+        f"  [bold]Ollama model[/bold]     : [magenta]{settings.ollama_model}[/magenta]",
         border_style="blue",
+        title="[bold blue]Configuration Details[/bold blue]",
     ))
 
 
